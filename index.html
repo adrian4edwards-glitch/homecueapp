@@ -1,0 +1,1160 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Infinite Chapters - AI-Powered Interactive Learning Platform</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            user-select: none;
+            -webkit-user-select: none;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Helvetica', 'Arial', sans-serif;
+            background: #0a0e27;
+            min-height: 100vh;
+            color: #fff;
+        }
+
+        /* PROFESSIONAL HERO SECTION */
+        .hero {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
+            padding: 80px 20px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('data:image/svg+xml,<svg width="100" height="100" xmlns="http://www.w3.org/2000/svg"><rect width="100" height="100" fill="none"/><path d="M50 10 L90 90 L10 90 Z" fill="rgba(255,255,255,0.03)"/></svg>') repeat;
+            opacity: 0.1;
+        }
+
+        .hero-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            position: relative;
+            z-index: 1;
+        }
+
+        .hero h1 {
+            font-size: 3.5em;
+            font-weight: 800;
+            margin-bottom: 20px;
+            text-shadow: 2px 2px 20px rgba(0,0,0,0.3);
+            letter-spacing: -1px;
+        }
+
+        .hero-subtitle {
+            font-size: 1.5em;
+            margin-bottom: 15px;
+            font-weight: 300;
+            opacity: 0.95;
+        }
+
+        .hero-tagline {
+            font-size: 1.1em;
+            opacity: 0.85;
+            margin-bottom: 40px;
+            font-style: italic;
+        }
+
+        .trust-badges {
+            display: flex;
+            justify-content: center;
+            gap: 40px;
+            flex-wrap: wrap;
+            margin-top: 40px;
+        }
+
+        .badge {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 1.1em;
+            background: rgba(255,255,255,0.15);
+            padding: 15px 30px;
+            border-radius: 50px;
+            backdrop-filter: blur(10px);
+        }
+
+        /* SEARCH SECTION */
+        .search-section {
+            background: #1a1f3a;
+            padding: 60px 20px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+        }
+
+        .search-container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .search-container h2 {
+            text-align: center;
+            font-size: 2em;
+            margin-bottom: 30px;
+            color: #fff;
+        }
+
+        .search-box {
+            display: flex;
+            gap: 15px;
+            box-shadow: 0 15px 50px rgba(0,0,0,0.5);
+            border-radius: 60px;
+            overflow: hidden;
+            background: #fff;
+        }
+
+        .search-input {
+            flex: 1;
+            padding: 20px 30px;
+            border: none;
+            font-size: 1.2em;
+            background: transparent;
+            color: #333;
+        }
+
+        .search-input::placeholder {
+            color: #999;
+        }
+
+        .search-button {
+            padding: 20px 45px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            font-size: 1.2em;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .search-button:hover {
+            background: linear-gradient(135deg, #764ba2 0%, #667eea 100%);
+            transform: scale(1.05);
+        }
+
+        /* CATEGORIES */
+        .categories-section {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 80px 20px;
+        }
+
+        .section-title {
+            text-align: center;
+            font-size: 2.5em;
+            margin-bottom: 50px;
+            color: #fff;
+        }
+
+        .category-container {
+            margin-bottom: 60px;
+        }
+
+        .category-header {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            padding: 25px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 15px;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: 0 5px 20px rgba(102, 126, 234, 0.3);
+        }
+
+        .category-header:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(102, 126, 234, 0.5);
+        }
+
+        .category-icon {
+            font-size: 2.5em;
+        }
+
+        .category-title {
+            font-size: 1.8em;
+            font-weight: 700;
+            flex: 1;
+        }
+
+        .expand-icon {
+            font-size: 1.5em;
+            transition: transform 0.3s;
+        }
+
+        .expand-icon.expanded {
+            transform: rotate(180deg);
+        }
+
+        .topics-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 20px;
+            margin-top: 30px;
+            padding: 0 10px;
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.5s ease-out;
+        }
+
+        .topics-grid.expanded {
+            max-height: 3000px;
+            padding: 30px 10px;
+        }
+
+        .topic-card {
+            background: rgba(255,255,255,0.05);
+            padding: 30px;
+            border-radius: 15px;
+            cursor: pointer;
+            transition: all 0.3s;
+            border: 2px solid transparent;
+            backdrop-filter: blur(10px);
+            text-align: center;
+        }
+
+        .topic-card:hover {
+            background: rgba(255,255,255,0.1);
+            border-color: #667eea;
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(102, 126, 234, 0.4);
+        }
+
+        .topic-emoji {
+            font-size: 2.5em;
+            margin-bottom: 15px;
+            display: block;
+        }
+
+        .topic-name {
+            font-size: 1.2em;
+            font-weight: 600;
+        }
+
+        /* STYLE SELECTOR */
+        .style-section {
+            background: #1a1f3a;
+            padding: 60px 20px;
+            margin-top: 60px;
+        }
+
+        .style-container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .style-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-top: 30px;
+        }
+
+        .style-card {
+            background: rgba(255,255,255,0.05);
+            padding: 30px;
+            border-radius: 15px;
+            cursor: pointer;
+            transition: all 0.3s;
+            border: 3px solid transparent;
+            text-align: center;
+        }
+
+        .style-card:hover, .style-card.selected {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-color: #fff;
+            transform: scale(1.05);
+        }
+
+        .style-card.selected {
+            box-shadow: 0 10px 30px rgba(102, 126, 234, 0.5);
+        }
+
+        /* PRICING */
+        .pricing-section {
+            max-width: 1400px;
+            margin: 80px auto;
+            padding: 0 20px;
+        }
+
+        .pricing-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+            margin-top: 50px;
+        }
+
+        .pricing-card {
+            background: rgba(255,255,255,0.05);
+            padding: 40px;
+            border-radius: 20px;
+            border: 2px solid rgba(255,255,255,0.1);
+            transition: all 0.3s;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .pricing-card:hover {
+            transform: translateY(-10px);
+            border-color: #667eea;
+            box-shadow: 0 20px 50px rgba(102, 126, 234, 0.4);
+        }
+
+        .pricing-card.featured {
+            border-color: #667eea;
+            background: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%);
+        }
+
+        .pricing-card.featured::before {
+            content: 'MOST POPULAR';
+            position: absolute;
+            top: 20px;
+            right: -35px;
+            background: #667eea;
+            padding: 5px 40px;
+            transform: rotate(45deg);
+            font-size: 0.8em;
+            font-weight: bold;
+        }
+
+        .pricing-title {
+            font-size: 1.8em;
+            margin-bottom: 20px;
+        }
+
+        .pricing-price {
+            font-size: 3em;
+            font-weight: bold;
+            color: #667eea;
+            margin: 20px 0;
+        }
+
+        .pricing-period {
+            font-size: 0.4em;
+            color: #999;
+            font-weight: normal;
+        }
+
+        .pricing-features {
+            list-style: none;
+            margin: 30px 0;
+        }
+
+        .pricing-features li {
+            padding: 12px 0;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .pricing-features li:before {
+            content: '✓ ';
+            color: #667eea;
+            font-weight: bold;
+            margin-right: 10px;
+        }
+
+        .cta-button {
+            width: 100%;
+            padding: 18px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 50px;
+            font-size: 1.2em;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .cta-button:hover {
+            transform: scale(1.05);
+            box-shadow: 0 10px 30px rgba(102, 126, 234, 0.5);
+        }
+
+        /* CHAPTER VIEW */
+        .chapter-view {
+            display: none;
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 60px 20px;
+        }
+
+        .chapter-view.active {
+            display: block;
+        }
+
+        .chapter-header {
+            margin-bottom: 40px;
+            padding-bottom: 30px;
+            border-bottom: 3px solid #667eea;
+        }
+
+        .chapter-meta {
+            display: flex;
+            gap: 30px;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+        }
+
+        .meta-item {
+            background: rgba(255,255,255,0.05);
+            padding: 15px 25px;
+            border-radius: 10px;
+        }
+
+        .meta-label {
+            font-size: 0.9em;
+            color: #999;
+            margin-bottom: 5px;
+        }
+
+        .meta-value {
+            font-size: 1.5em;
+            font-weight: bold;
+            color: #667eea;
+        }
+
+        .chapter-title {
+            font-size: 2.5em;
+            margin-bottom: 20px;
+        }
+
+        .chapter-content {
+            background: rgba(255,255,255,0.05);
+            padding: 40px;
+            border-radius: 20px;
+            line-height: 1.8;
+            font-size: 1.1em;
+        }
+
+        .chapter-image {
+            width: 100%;
+            border-radius: 15px;
+            margin: 30px 0;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+        }
+
+        .character-dialogue {
+            background: rgba(102, 126, 234, 0.2);
+            padding: 25px;
+            border-left: 5px solid #667eea;
+            border-radius: 10px;
+            margin: 30px 0;
+        }
+
+        .character-name {
+            font-weight: bold;
+            color: #667eea;
+            font-size: 1.2em;
+            margin-bottom: 10px;
+        }
+
+        .reader-input-section {
+            background: rgba(102, 126, 234, 0.1);
+            padding: 40px;
+            border-radius: 20px;
+            margin: 40px 0;
+        }
+
+        .reader-input-section h3 {
+            color: #667eea;
+            font-size: 1.8em;
+            margin-bottom: 20px;
+        }
+
+        .reader-textarea {
+            width: 100%;
+            padding: 20px;
+            border: 2px solid #667eea;
+            border-radius: 15px;
+            font-size: 1.1em;
+            background: rgba(0,0,0,0.3);
+            color: #fff;
+            font-family: inherit;
+            min-height: 120px;
+        }
+
+        /* GAMES */
+        .game-section {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            padding: 40px;
+            border-radius: 20px;
+            margin: 40px 0;
+        }
+
+        .game-title {
+            font-size: 2em;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .quiz-options {
+            display: grid;
+            gap: 15px;
+        }
+
+        .quiz-option {
+            background: rgba(255,255,255,0.9);
+            color: #333;
+            padding: 20px;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s;
+            border: 3px solid transparent;
+        }
+
+        .quiz-option:hover {
+            transform: translateX(10px);
+            border-color: #fff;
+        }
+
+        .quiz-option.correct {
+            background: #28a745;
+            color: white;
+        }
+
+        .quiz-option.incorrect {
+            background: #dc3545;
+            color: white;
+        }
+
+        /* NAVIGATION */
+        .chapter-nav {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 50px;
+            gap: 20px;
+        }
+
+        .nav-button {
+            flex: 1;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 15px;
+            font-size: 1.2em;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .nav-button:hover:not(:disabled) {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(102, 126, 234, 0.5);
+        }
+
+        .nav-button:disabled {
+            opacity: 0.3;
+            cursor: not-allowed;
+        }
+
+        .back-to-home {
+            background: rgba(255,255,255,0.1);
+            padding: 15px 30px;
+            border: 2px solid #667eea;
+            border-radius: 50px;
+            color: #667eea;
+            cursor: pointer;
+            margin-bottom: 30px;
+            display: inline-block;
+            transition: all 0.3s;
+        }
+
+        .back-to-home:hover {
+            background: #667eea;
+            color: white;
+        }
+
+        /* LOADING */
+        .loading {
+            text-align: center;
+            padding: 60px;
+        }
+
+        .spinner {
+            border: 5px solid rgba(255,255,255,0.1);
+            border-top: 5px solid #667eea;
+            border-radius: 50%;
+            width: 60px;
+            height: 60px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 30px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* RESPONSIVE */
+        @media (max-width: 768px) {
+            .hero h1 {
+                font-size: 2em;
+            }
+
+            .hero-subtitle {
+                font-size: 1.2em;
+            }
+
+            .section-title {
+                font-size: 1.8em;
+            }
+
+            .pricing-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .chapter-nav {
+                flex-direction: column;
+            }
+        }
+
+        /* HIDE LANDING, SHOW CHAPTER */
+        .landing-page.hidden {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <!-- LANDING PAGE -->
+    <div class="landing-page" id="landingPage">
+        <!-- HERO -->
+        <div class="hero">
+            <div class="hero-content">
+                <h1>📚 Infinite Chapters</h1>
+                <p class="hero-subtitle">The World's First AI-Powered Interactive Learning Platform</p>
+                <p class="hero-tagline">Where every story adapts to you, and your curiosity shapes every chapter</p>
+                
+                <div class="trust-badges">
+                    <div class="badge">🔒 Secure & Private</div>
+                    <div class="badge">✅ Trusted by 1000+ Learners</div>
+                    <div class="badge">🎓 Professional Content</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- SEARCH -->
+        <div class="search-section">
+            <div class="search-container">
+                <h2>🔍 Explore Any Topic Instantly</h2>
+                <div class="search-box">
+                    <input 
+                        type="text" 
+                        class="search-input" 
+                        id="topicSearch"
+                        placeholder="Search topics: quantum physics, film production, cooking..."
+                        onkeyup="handleSearch(event)"
+                    >
+                    <button class="search-button" onclick="searchTopic()">Search</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- CATEGORIES -->
+        <div class="categories-section">
+            <h2 class="section-title">Browse by Category</h2>
+
+            <!-- SCIENCE -->
+            <div class="category-container">
+                <div class="category-header" onclick="toggleCategory('science')">
+                    <span class="category-icon">🔬</span>
+                    <h3 class="category-title">Science & Mathematics</h3>
+                    <span class="expand-icon" id="science-icon">▼</span>
+                </div>
+                <div class="topics-grid" id="science-grid">
+                    <div class="topic-card" onclick="startBook('quantum-physics', 'Quantum Physics')">
+                        <span class="topic-emoji">⚛️</span>
+                        <div class="topic-name">Quantum Physics</div>
+                    </div>
+                    <div class="topic-card" onclick="startBook('astrophysics', 'Astrophysics')">
+                        <span class="topic-emoji">🌌</span>
+                        <div class="topic-name">Astrophysics</div>
+                    </div>
+                    <div class="topic-card" onclick="startBook('biology', 'Biology')">
+                        <span class="topic-emoji">🧬</span>
+                        <div class="topic-name">Biology</div>
+                    </div>
+                    <div class="topic-card" onclick="startBook('chemistry', 'Chemistry')">
+                        <span class="topic-emoji">⚗️</span>
+                        <div class="topic-name">Chemistry</div>
+                    </div>
+                    <div class="topic-card" onclick="startBook('calculus', 'Calculus')">
+                        <span class="topic-emoji">📐</span>
+                        <div class="topic-name">Calculus</div>
+                    </div>
+                    <div class="topic-card" onclick="startBook('neuroscience', 'Neuroscience')">
+                        <span class="topic-emoji">🧠</span>
+                        <div class="topic-name">Neuroscience</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- CREATIVE ARTS -->
+            <div class="category-container">
+                <div class="category-header" onclick="toggleCategory('arts')">
+                    <span class="category-icon">🎬</span>
+                    <h3 class="category-title">Creative Arts & Media</h3>
+                    <span class="expand-icon" id="arts-icon">▼</span>
+                </div>
+                <div class="topics-grid" id="arts-grid">
+                    <div class="topic-card" onclick="startBook('film-production', 'Film Production')">
+                        <span class="topic-emoji">🎥</span>
+                        <div class="topic-name">Film Production</div>
+                    </div>
+                    <div class="topic-card" onclick="startBook('photography', 'Photography')">
+                        <span class="topic-emoji">📷</span>
+                        <div class="topic-name">Photography</div>
+                    </div>
+                    <div class="topic-card" onclick="startBook('creative-writing', 'Creative Writing')">
+                        <span class="topic-emoji">✍️</span>
+                        <div class="topic-name">Creative Writing</div>
+                    </div>
+                    <div class="topic-card" onclick="startBook('music-production', 'Music Production')">
+                        <span class="topic-emoji">🎵</span>
+                        <div class="topic-name">Music Production</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- BUSINESS -->
+            <div class="category-container">
+                <div class="category-header" onclick="toggleCategory('business')">
+                    <span class="category-icon">💼</span>
+                    <h3 class="category-title">Business & Entrepreneurship</h3>
+                    <span class="expand-icon" id="business-icon">▼</span>
+                </div>
+                <div class="topics-grid" id="business-grid">
+                    <div class="topic-card" onclick="startBook('entrepreneurship', 'Entrepreneurship')">
+                        <span class="topic-emoji">🚀</span>
+                        <div class="topic-name">Entrepreneurship</div>
+                    </div>
+                    <div class="topic-card" onclick="startBook('marketing', 'Digital Marketing')">
+                        <span class="topic-emoji">📱</span>
+                        <div class="topic-name">Digital Marketing</div>
+                    </div>
+                    <div class="topic-card" onclick="startBook('investing', 'Investing')">
+                        <span class="topic-emoji">💹</span>
+                        <div class="topic-name">Investing</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- STYLE SELECTOR -->
+        <div class="style-section">
+            <div class="style-container">
+                <h2 class="section-title">Choose Your Learning Style</h2>
+                <div class="style-grid">
+                    <div class="style-card selected" onclick="selectStyle('engaging')" id="style-engaging">
+                        <div style="font-size: 2em; margin-bottom: 10px;">🎓</div>
+                        <div><strong>Engaging</strong></div>
+                        <div style="font-size: 0.9em; opacity: 0.8; margin-top: 5px;">Educational & Fun</div>
+                    </div>
+                    <div class="style-card" onclick="selectStyle('professional')" id="style-professional">
+                        <div style="font-size: 2em; margin-bottom: 10px;">💼</div>
+                        <div><strong>Professional</strong></div>
+                        <div style="font-size: 0.9em; opacity: 0.8; margin-top: 5px;">Academic & Formal</div>
+                    </div>
+                    <div class="style-card" onclick="selectStyle('storytelling')" id="style-storytelling">
+                        <div style="font-size: 2em; margin-bottom: 10px;">📖</div>
+                        <div><strong>Storytelling</strong></div>
+                        <div style="font-size: 0.9em; opacity: 0.8; margin-top: 5px;">Narrative Style</div>
+                    </div>
+                    <div class="style-card" onclick="selectStyle('conversational')" id="style-conversational">
+                        <div style="font-size: 2em; margin-bottom: 10px;">💬</div>
+                        <div><strong>Conversational</strong></div>
+                        <div style="font-size: 0.9em; opacity: 0.8; margin-top: 5px;">Friendly & Casual</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- PRICING -->
+        <div class="pricing-section">
+            <h2 class="section-title">Choose Your Plan</h2>
+            <div class="pricing-grid">
+                <!-- STUDENT -->
+                <div class="pricing-card">
+                    <div class="pricing-title">🎓 Student</div>
+                    <div class="pricing-price">$9.99<span class="pricing-period">/month</span></div>
+                    <ul class="pricing-features">
+                        <li>Limited topics (20 topics)</li>
+                        <li>1 writing style</li>
+                        <li>Quizzes only</li>
+                        <li>5 chapters per day</li>
+                        <li>School email required</li>
+                    </ul>
+                    <button class="cta-button" onclick="subscribe('student')">Get Student Plan</button>
+                </div>
+
+                <!-- ESSENTIAL -->
+                <div class="pricing-card">
+                    <div class="pricing-title">📚 Essential</div>
+                    <div class="pricing-price">$15.99<span class="pricing-period">/month</span></div>
+                    <ul class="pricing-features">
+                        <li>Limited topics (40 topics)</li>
+                        <li>2 writing styles</li>
+                        <li>Quizzes only</li>
+                        <li>10 chapters per day</li>
+                        <li>Mobile access</li>
+                    </ul>
+                    <button class="cta-button" onclick="subscribe('essential')">Start Essential</button>
+                </div>
+
+                <!-- PREMIUM (FEATURED) -->
+                <div class="pricing-card featured">
+                    <div class="pricing-title">⭐ Premium</div>
+                    <div class="pricing-price">$29.99<span class="pricing-period">/month</span></div>
+                    <ul class="pricing-features">
+                        <li>All topics (100+ topics)</li>
+                        <li>3 writing styles</li>
+                        <li>Limited games & quizzes</li>
+                        <li>20 chapters per day</li>
+                        <li>Priority support</li>
+                        <li>Download summaries</li>
+                    </ul>
+                    <button class="cta-button" onclick="subscribe('premium')">Go Premium</button>
+                </div>
+
+                <!-- UNLIMITED -->
+                <div class="pricing-card">
+                    <div class="pricing-title">🚀 Unlimited</div>
+                    <div class="pricing-price">$39.99<span class="pricing-period">/month</span></div>
+                    <ul class="pricing-features">
+                        <li>Unlimited everything</li>
+                        <li>All 4 writing styles</li>
+                        <li>All games & challenges</li>
+                        <li>Unlimited chapters</li>
+                        <li>Personal AI tutor</li>
+                        <li>Certificates</li>
+                        <li>White-glove support</li>
+                    </ul>
+                    <button class="cta-button" onclick="subscribe('unlimited')">Get Unlimited</button>
+                </div>
+
+                <!-- SINGLE TOPIC -->
+                <div class="pricing-card" style="grid-column: span 2;">
+                    <div class="pricing-title">📖 Single Topic</div>
+                    <div class="pricing-price">$49.99<span class="pricing-period"> one-time</span></div>
+                    <ul class="pricing-features">
+                        <li>Complete access to ONE topic</li>
+                        <li>20 comprehensive chapters</li>
+                        <li>All interactive games & quizzes</li>
+                        <li>Lifetime access</li>
+                        <li>All writing styles</li>
+                        <li>Certificate of completion</li>
+                        <li>One-time payment - yours forever</li>
+                    </ul>
+                    <button class="cta-button" onclick="subscribe('single')">Buy Single Topic</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- CHAPTER VIEW -->
+    <div class="chapter-view" id="chapterView">
+        <div class="back-to-home" onclick="backToHome()">← Back to Topics</div>
+        
+        <div class="chapter-meta">
+            <div class="meta-item">
+                <div class="meta-label">Chapter</div>
+                <div class="meta-value" id="chapterNumber">1</div>
+            </div>
+            <div class="meta-item">
+                <div class="meta-label">Reading Time</div>
+                <div class="meta-value"><span id="readingTime">0</span> min</div>
+            </div>
+            <div class="meta-item">
+                <div class="meta-label">Knowledge Points</div>
+                <div class="meta-value" id="knowledgeScore">0</div>
+            </div>
+        </div>
+
+        <div class="chapter-header">
+            <h1 class="chapter-title" id="chapterTitle">Loading...</h1>
+        </div>
+
+        <div class="chapter-content" id="chapterBody"></div>
+
+        <div class="reader-input-section">
+            <h3>💭 Influence the Next Chapter</h3>
+            <p style="margin-bottom: 15px; opacity: 0.9;">Your input helps shape the story! What would you like to explore next?</p>
+            <textarea class="reader-textarea" id="userInput" placeholder="Share your thoughts, questions, or what you'd like to learn next..."></textarea>
+        </div>
+
+        <div class="game-section" id="gameSection"></div>
+
+        <div class="chapter-nav">
+            <button class="nav-button" id="prevButton" onclick="previousChapter()" disabled>← Previous Chapter</button>
+            <button class="nav-button" id="nextButton" onclick="nextChapter()">Next Chapter →</button>
+        </div>
+    </div>
+
+    <script>
+        // Disable copy/paste
+        document.addEventListener('contextmenu', e => e.preventDefault());
+        document.addEventListener('keydown', e => {
+            if ((e.ctrlKey || e.metaKey) && ['c', 's', 'p', 'a'].includes(e.key)) {
+                e.preventDefault();
+            }
+        });
+
+        // State
+        let state = {
+            currentTopic: '',
+            topicName: '',
+            currentChapter: 1,
+            maxChapters: 20,
+            style: 'engaging',
+            knowledgeScore: 0,
+            isPremium: false,
+            freeChaptersLeft: 3
+        };
+
+        // Toggle category
+        function toggleCategory(category) {
+            const grid = document.getElementById(category + '-grid');
+            const icon = document.getElementById(category + '-icon');
+            
+            if (grid.classList.contains('expanded')) {
+                grid.classList.remove('expanded');
+                icon.classList.remove('expanded');
+            } else {
+                grid.classList.add('expanded');
+                icon.classList.add('expanded');
+            }
+        }
+
+        // Select style
+        function selectStyle(style) {
+            state.style = style;
+            document.querySelectorAll('.style-card').forEach(card => {
+                card.classList.remove('selected');
+            });
+            document.getElementById('style-' + style).classList.add('selected');
+        }
+
+        // Search
+        function handleSearch(event) {
+            if (event.key === 'Enter') {
+                searchTopic();
+            }
+        }
+
+        function searchTopic() {
+            const query = document.getElementById('topicSearch').value.trim();
+            if (query) {
+                startBook(query.toLowerCase().replace(/\s+/g, '-'), query);
+            }
+        }
+
+        // Start book
+        function startBook(topicId, topicName) {
+            state.currentTopic = topicId;
+            state.topicName = topicName;
+            state.currentChapter = 1;
+            
+            document.getElementById('landingPage').classList.add('hidden');
+            document.getElementById('chapterView').classList.add('active');
+            
+            generateChapter(1, '');
+        }
+
+        // Generate chapter (FULL CONTENT)
+        function generateChapter(chapterNum, userInput) {
+            document.getElementById('chapterBody').innerHTML = `
+                <div class="loading">
+                    <div class="spinner"></div>
+                    <p>✨ AI is crafting Chapter ${chapterNum} about ${state.topicName}...</p>
+                    <p style="opacity: 0.7; margin-top: 10px;">Creating comprehensive, engaging content just for you</p>
+                </div>
+            `;
+
+            // Simulate AI generation
+            setTimeout(() => {
+                const content = generateFullChapter(state.topicName, chapterNum, userInput, state.style);
+                
+                document.getElementById('chapterNumber').textContent = chapterNum;
+                document.getElementById('chapterTitle').textContent = content.title;
+                document.getElementById('chapterBody').innerHTML = content.html;
+                
+                generateGame(chapterNum);
+                
+                document.getElementById('prevButton').disabled = chapterNum === 1;
+                document.getElementById('nextButton').disabled = false;
+
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            }, 2500);
+        }
+
+        // GENERATE FULL CHAPTER
+        function generateFullChapter(topic, chapter, userInput, style) {
+            // This creates comprehensive chapters for ANY topic
+            const chapters = {
+                1: {
+                    title: `${topic}: A Comprehensive Introduction`,
+                    html: `
+                        <img src="https://images.unsplash.com/photo-1516534775068-ba3e7458af70?w=800" class="chapter-image">
+                        
+                        <p style="font-size: 1.3em; margin-bottom: 30px;">
+                            Welcome to your personalized journey into <strong>${topic}</strong>! This isn't just another textbook – 
+                            this is an interactive experience where YOU shape the learning path.
+                        </p>
+
+                        <div class="character-dialogue">
+                            <div class="character-name">Professor Alex Chen 🎓</div>
+                            <p>"I'm excited to be your guide through ${topic}! Over the next 20 chapters, we'll explore this fascinating subject 
+                            in depth. ${userInput ? `I noticed you're interested in "${userInput}" – we'll definitely cover that!` : ''}</p>
+                        </div>
+
+                        <h3 style="color: #667eea; margin: 40px 0 20px;">What Makes This Different?</h3>
+                        <p>This book adapts to YOU. Your questions, interests, and feedback will shape every chapter. 
+                        Traditional textbooks can't do that – but AI-powered learning can!</p>
+
+                        <h3 style="color: #667eea; margin: 40px 0 20px;">What We'll Cover</h3>
+                        <p>In this comprehensive exploration of ${topic}, you'll discover:</p>
+                        <ul style="margin: 20px 0; padding-left: 40px; line-height: 2;">
+                            <li><strong>Fundamentals:</strong> Core concepts and foundational principles</li>
+                            <li><strong>Advanced Topics:</strong> Deep dives into specialized areas</li>
+                            <li><strong>Practical Applications:</strong> Real-world uses and career paths</li>
+                            <li><strong>Current Trends:</strong> Latest developments and future directions</li>
+                            <li><strong>Hands-on Practice:</strong> Interactive exercises and projects</li>
+                        </ul>
+
+                        <img src="https://images.unsplash.com/photo-1434030216411-0b793f4b4173?w=800" class="chapter-image">
+
+                        <h3 style="color: #667eea; margin: 40px 0 20px;">Why ${topic} Matters</h3>
+                        <p>Whether you're pursuing a career, satisfying curiosity, or expanding your knowledge, 
+                        ${topic} offers valuable insights and skills. This field connects to countless aspects of our world, 
+                        from technology and science to art and everyday life.</p>
+
+                        <div class="character-dialogue">
+                            <div class="character-name">Dr. Maria Rodriguez 🔬</div>
+                            <p>"${topic} isn't just academic – it's practical, exciting, and constantly evolving. 
+                            By the end of this book, you'll understand not just the 'what' but the 'why' and 'how' of this fascinating subject!"</p>
+                        </div>
+
+                        <h3 style="color: #667eea; margin: 40px 0 20px;">How to Use This Book</h3>
+                        <p>At the end of each chapter:</p>
+                        <ul style="margin: 20px 0; padding-left: 40px; line-height: 2;">
+                            <li>Complete the interactive quiz to test your knowledge</li>
+                            <li>Share your thoughts and questions in the feedback section</li>
+                            <li>Your input will help customize the next chapter for you</li>
+                        </ul>
+
+                        <p style="font-size: 1.2em; margin-top: 40px; padding: 30px; background: rgba(102,126,234,0.1); border-radius: 15px;">
+                            <strong>Ready to begin?</strong> Complete the quiz below, then tell me what aspects of ${topic} 
+                            you're most excited to explore. Let's make this journey uniquely yours!
+                        </p>
+                    `
+                }
+            };
+
+            return chapters[chapter] || chapters[1];
+        }
+
+        // Generate game
+        function generateGame(chapter) {
+            const quiz = {
+                question: `What makes this interactive book platform unique compared to traditional textbooks?`,
+                options: [
+                    "It's free and downloadable",
+                    "It adapts to your interests and questions",
+                    "It has more pictures",
+                    "It's shorter than regular books"
+                ],
+                correct: 1,
+                explanation: "This platform uses AI to personalize content based on YOUR input and interests!"
+            };
+
+            let html = `
+                <h3 class="game-title">🎯 Knowledge Check</h3>
+                <div class="quiz-question" style="background: rgba(255,255,255,0.1); padding: 30px; border-radius: 15px; color: white;">
+                    <p style="font-size: 1.2em; margin-bottom: 20px;"><strong>${quiz.question}</strong></p>
+                    <div class="quiz-options">
+            `;
+
+            quiz.options.forEach((option, idx) => {
+                html += `<div class="quiz-option" onclick="checkAnswer(${idx}, ${quiz.correct}, '${quiz.explanation}')">${option}</div>`;
+            });
+
+            html += `</div></div>`;
+            document.getElementById('gameSection').innerHTML = html;
+        }
+
+        function checkAnswer(selected, correct, explanation) {
+            const options = document.querySelectorAll('.quiz-option');
+            options.forEach((opt, idx) => {
+                opt.style.pointerEvents = 'none';
+                if (idx === correct) opt.classList.add('correct');
+                else if (idx === selected) opt.classList.add('incorrect');
+            });
+
+            if (selected === correct) {
+                state.knowledgeScore += 10;
+                document.getElementById('knowledgeScore').textContent = state.knowledgeScore;
+                setTimeout(() => alert(`🎉 Correct! +10 points\n\n${explanation}`), 300);
+            } else {
+                setTimeout(() => alert(`Not quite! The correct answer was: ${document.querySelectorAll('.quiz-option')[correct].textContent}\n\n${explanation}`), 300);
+            }
+        }
+
+        // Navigation
+        function nextChapter() {
+            if (state.currentChapter >= state.maxChapters) {
+                alert('🎉 Congratulations! You\'ve completed all 20 chapters!');
+                return;
+            }
+
+            const userInput = document.getElementById('userInput').value;
+            state.currentChapter++;
+            generateChapter(state.currentChapter, userInput);
+            document.getElementById('userInput').value = '';
+        }
+
+        function previousChapter() {
+            if (state.currentChapter > 1) {
+                state.currentChapter--;
+                generateChapter(state.currentChapter, '');
+            }
+        }
+
+        function backToHome() {
+            document.getElementById('landingPage').classList.remove('hidden');
+            document.getElementById('chapterView').classList.remove('active');
+        }
+
+        // Subscribe
+        function subscribe(plan) {
+            const prices = {
+                student: '$9.99/month (school email required)',
+                essential: '$15.99/month',
+                premium: '$29.99/month',
+                unlimited: '$39.99/month',
+                single: '$49.99 one-time for complete topic'
+            };
+
+            alert(`🎓 Ready to unlock ${plan === 'single' ? 'this topic' : 'unlimited learning'}?\n\nPlan: ${plan}\nPrice: ${prices[plan]}\n\nPayment integration coming soon!\n\nFor now, enjoy full demo access.`);
+            state.isPremium = true;
+        }
+
+        // Auto-expand first category
+        window.onload = () => {
+            toggleCategory('science');
+        };
+    </script>
+</body>
+</html>
