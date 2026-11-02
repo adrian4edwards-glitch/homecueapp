@@ -1,0 +1,307 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>HomeCue Studio</title>
+<style>
+:root{--bg:#0b0d14;--panel:#121522;--panel2:#181c2d;--line:#262b40;--text:#e6e8f2;--mute:#8b90a8;--accent:#f5a524;--accent2:#7c5cff;--ok:#22c55e;--warn:#f59e0b;--err:#ef4444;--r:10px}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--text);font:14px/1.45 Inter,system-ui,-apple-system,Segoe UI,sans-serif}
+button,input,select,textarea{font:inherit;color:inherit}a{color:inherit;text-decoration:none}a[href='#']{color:var(--accent)}
+button{background:var(--panel2);border:1px solid var(--line);border-radius:8px;padding:7px 12px;cursor:pointer}
+button:hover{border-color:var(--accent2)}button.primary{background:var(--accent);color:#111;border:none;font-weight:600}
+button.small{padding:3px 8px;font-size:12px}button:disabled{opacity:.5;cursor:wait}
+input,select,textarea{background:#0e1120;border:1px solid var(--line);border-radius:8px;padding:7px 9px;width:100%}
+textarea{min-height:70px;resize:vertical}label{display:block;font-size:12px;color:var(--mute);margin:8px 0 3px}
+.app{display:grid;grid-template-columns:250px 1fr;min-height:100vh}
+aside{background:var(--panel);border-right:1px solid var(--line);padding:16px;display:flex;flex-direction:column;gap:10px}
+.brand{font-weight:800;font-size:18px;letter-spacing:.3px}.brand span{color:var(--accent)}
+.plist{display:flex;flex-direction:column;gap:6px;overflow:auto}
+.pitem{padding:9px 10px;border-radius:8px;cursor:pointer;border:1px solid transparent}
+.pitem:hover,.pitem.on{background:var(--panel2);border-color:var(--line)}.pitem small{color:var(--mute);display:block}
+main{padding:20px 26px;overflow:auto;min-width:0}
+.tabs{display:flex;gap:4px;border-bottom:1px solid var(--line);margin:14px 0 18px;flex-wrap:wrap}
+.tab{padding:9px 14px;cursor:pointer;border-bottom:2px solid transparent;color:var(--mute)}
+.tab.on{color:var(--text);border-color:var(--accent)}
+.grid{display:grid;gap:14px}.g2{grid-template-columns:repeat(auto-fill,minmax(320px,1fr))}.g4{grid-template-columns:repeat(4,1fr)}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:var(--r);padding:14px}
+.row{display:flex;gap:10px;align-items:center;flex-wrap:wrap}.spacer{flex:1}
+.muted{color:var(--mute)}.pill{display:inline-block;padding:1px 8px;border-radius:99px;font-size:11px;background:var(--panel2);border:1px solid var(--line)}
+.st-ready,.st-approved{color:var(--ok)}.st-failed{color:var(--err)}.st-generating{color:var(--warn)}
+h1{margin:0;font-size:22px}h2{font-size:16px;margin:0 0 10px}h3{font-size:14px;margin:0 0 6px}
+.scene{margin-bottom:16px}.shot{display:grid;grid-template-columns:150px 1fr;gap:12px;padding:10px;border-top:1px solid var(--line)}
+.thumb{width:150px;aspect-ratio:16/9;background:#05060a;border-radius:6px;overflow:hidden}.thumb video{width:100%;height:100%;object-fit:cover}
+.shot-f{display:grid;grid-template-columns:repeat(5,1fr);gap:6px}.shot-f label{margin-top:0}
+.tl{position:relative;overflow-x:auto;background:var(--panel);border:1px solid var(--line);border-radius:var(--r);padding:10px}
+.track{position:relative;height:46px;margin:4px 0 4px 70px;min-width:100%}.tname{position:absolute;left:-70px;top:14px;font-size:11px;color:var(--mute)}
+.clip{position:absolute;top:2px;bottom:2px;border-radius:5px;font-size:10px;padding:3px 5px;overflow:hidden;white-space:nowrap;cursor:pointer;border:1px solid #0006}
+.clip.v{background:#3b3f6b}.clip.v.ready{background:#3c5a8c}.clip.d{background:#7c5cff99}.clip.m{background:#1f7a5c99}.clip.s{background:#8a5a1f99}
+.clip.sel{outline:2px solid var(--accent)}
+video.player{width:100%;max-height:60vh;background:#000;border-radius:var(--r)}
+.issue{padding:8px 10px;border-left:3px solid var(--mute);background:var(--panel);margin-bottom:6px;border-radius:4px}
+.issue.error{border-color:var(--err)}.issue.warning{border-color:var(--warn)}.issue.info{border-color:var(--accent2)}
+.bar{height:8px;background:var(--panel2);border-radius:9px;overflow:hidden}.bar>i{display:block;height:100%;background:linear-gradient(90deg,var(--accent2),var(--accent))}
+.swatch{width:26px;height:26px;border-radius:6px;border:1px solid var(--line);display:inline-block}
+.toast{position:fixed;right:18px;bottom:18px;background:var(--panel2);border:1px solid var(--line);padding:10px 14px;border-radius:8px;max-width:420px;display:none}
+.hero{max-width:820px}.hero textarea{min-height:130px;font-size:15px}
+@media (max-width:820px){.app{grid-template-columns:1fr}aside{border-right:none;border-bottom:1px solid var(--line)}.g4,.shot-f{grid-template-columns:1fr 1fr}.shot{grid-template-columns:1fr}.thumb{width:100%}main{padding:16px}}
+</style>
+</head>
+<body>
+<div class="app">
+  <aside>
+    <div class="brand">HomeCue <span>Studio</span></div>
+    <button class="primary" onclick="showCreate()">+ New production</button>
+    <div class="muted" style="font-size:12px">Productions</div>
+    <div class="plist" id="plist"></div>
+    <div class="spacer"></div>
+    <div class="muted" style="font-size:11px" id="backends"></div>
+  </aside>
+  <main id="main"></main>
+</div>
+<div class="toast" id="toast"></div>
+<script>
+const $ = s => document.querySelector(s);
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+let P = null, TAB = 'bible', SEL = null;
+async function api(path, opts = {}) {
+  const r = await fetch(path, {headers: {'Content-Type': 'application/json'}, ...opts,
+    body: opts.body && typeof opts.body !== 'string' && !(opts.body instanceof Blob) ? JSON.stringify(opts.body) : opts.body});
+  if (!r.ok) { const t = await r.text(); let m = t; try { m = JSON.parse(t).detail } catch {} ; toast(m, true); throw new Error(m) }
+  const ct = r.headers.get('content-type') || '';
+  return ct.includes('json') ? r.json() : r.text();
+}
+function toast(m, bad) { const t = $('#toast'); t.textContent = typeof m === 'string' ? m : JSON.stringify(m); t.style.borderColor = bad ? 'var(--err)' : 'var(--line)'; t.style.display = 'block'; clearTimeout(t._h); t._h = setTimeout(() => t.style.display = 'none', 4500) }
+const file = p => p ? `/files/${P.id}/${p}` : '';
+const fmt = s => `${Math.floor(s / 60)}:${String(Math.round(s % 60)).padStart(2, '0')}`;
+const chr = id => P.bible.characters.find(c => c.id === id);
+
+async function boot() {
+  const h = await api('/api/health');
+  $('#backends').innerHTML = Object.entries(h.backends).map(([k, v]) => `<div><b>${k}</b>: ${esc(v)}</div>`).join('');
+  await refreshList();
+  const id = location.hash.slice(1);
+  id ? openProject(id) : showCreate();
+}
+async function refreshList() {
+  const ps = await api('/api/projects');
+  $('#plist').innerHTML = ps.map(p => `<div class="pitem ${P && P.id === p.id ? 'on' : ''}" onclick="openProject('${p.id}')">${esc(p.title)}<small>${esc(p.genre)} · ${p.scenes} scenes · ${p.shots} shots · ${fmt(p.duration)}</small></div>`).join('') || '<div class="muted">No productions yet.</div>';
+}
+function showCreate() {
+  P = null; location.hash = ''; refreshList();
+  $('#main').innerHTML = `<div class="hero"><h1>What are we making?</h1><p class="muted">Describe the film. The studio writes the story bible, screenplay and shot list, generates every shot, voice, score and effect, then edits, mixes and masters one finished film.</p>
+  <label>Prompt</label><textarea id="c_prompt" placeholder="A retired astronaut named Ruth discovers a signal from her lost daughter Kira on a dying space station..."></textarea>
+  <div class="grid g4" style="margin-top:6px">
+   <div><label>Medium</label><select id="c_medium"><option value="live_action">Live action (photoreal)</option><option value="animation_3d">3D feature animation</option><option value="cartoon_2d">2D cartoon</option><option value="anime">Anime</option><option value="stop_motion">Stop-motion</option><option value="motion_graphics">Motion graphics</option></select></div>
+   <div><label>Genre (auto if blank)</label><input id="c_genre" placeholder="auto"></div>
+   <div><label>Runtime (minutes)</label><input id="c_min" type="number" value="2" min="0.5" max="240" step="0.5"></div>
+   <div><label>Aspect</label><select id="c_aspect"><option>2.39:1</option><option>1.85:1</option><option>16:9</option><option>9:16</option><option>1:1</option><option>4:3</option></select></div>
+  </div>
+  <label>Characters (optional, one per line: "Name: look")</label><textarea id="c_chars" style="min-height:60px"></textarea>
+  <div class="row" style="margin-top:14px"><button class="primary" id="c_go" onclick="create()">Develop production</button><span class="muted" id="c_msg"></span></div></div>`;
+}
+async function create() {
+  const b = $('#c_go'); b.disabled = true; $('#c_msg').textContent = 'Writers’ room is working...';
+  try {
+    const p = await api('/api/projects', {method: 'POST', body: {prompt: $('#c_prompt').value, medium: $('#c_medium').value,
+      genre: $('#c_genre').value || null, target_minutes: +$('#c_min').value, aspect_ratio: $('#c_aspect').value,
+      characters: $('#c_chars').value.split('\n').map(s => s.trim()).filter(Boolean)}});
+    openProject(p.id);
+  } finally { b.disabled = false }
+}
+async function openProject(id, tab) {
+  P = await api(`/api/projects/${id}`); location.hash = id; if (tab) TAB = tab; refreshList(); render();
+}
+function render() {
+  const tabs = [['bible', 'Story Bible'], ['screenplay', 'Screenplay & Shots'], ['editor', 'Editor'], ['audio', 'Audio Studio'], ['continuity', 'Continuity'], ['render', 'Render & Export']];
+  const shots = P.scenes.reduce((a, s) => a + s.shots.length, 0);
+  $('#main').innerHTML = `<div class="row"><div><h1>${esc(P.bible.title)}</h1><div class="muted">${esc(P.bible.logline)}</div></div><div class="spacer"></div>
+   <span class="pill">${esc(P.bible.style.medium)}</span><span class="pill">${esc(P.bible.genre)}</span><span class="pill">${P.scenes.length} scenes · ${shots} shots · ${fmt(P.scenes.reduce((a, s) => a + s.shots.reduce((b, x) => b + x.duration, 0), 0))}</span>
+   <button onclick="delProject()">Delete</button></div>
+   <div class="tabs">${tabs.map(([k, v]) => `<div class="tab ${TAB === k ? 'on' : ''}" onclick="TAB='${k}';render()">${v}</div>`).join('')}</div><div id="view"></div>`;
+  ({bible: vBible, screenplay: vScreenplay, editor: vEditor, audio: vAudio, continuity: vContinuity, render: vRender})[TAB]();
+}
+async function delProject() { if (!confirm('Delete this production and all media?')) return; await api(`/api/projects/${P.id}`, {method: 'DELETE'}); showCreate() }
+
+/* ---------------- Story bible */
+function vBible() {
+  const b = P.bible, st = b.style;
+  $('#view').innerHTML = `<div class="grid g2">
+   <div class="card"><h2>Story</h2><label>Title</label><input data-k="title" value="${esc(b.title)}"><label>Logline</label><textarea data-k="logline">${esc(b.logline)}</textarea>
+    <label>Theme</label><input data-k="theme" value="${esc(b.theme)}"><label>Outline</label><textarea data-k="outline" style="min-height:120px">${esc(b.outline.join('\n'))}</textarea></div>
+   <div class="card"><h2>Look & tone (applied to every shot)</h2><label>Look</label><textarea data-s="look">${esc(st.look)}</textarea>
+    <div class="grid" style="grid-template-columns:1fr 1fr;gap:8px"><div><label>Tone</label><input data-s="tone" value="${esc(st.tone)}"></div><div><label>Grade</label><select data-s="grade">${['teal_orange', 'warm', 'cool', 'noir', 'pastel', 'vivid', 'none'].map(g => `<option ${g === st.grade ? 'selected' : ''}>${g}</option>`).join('')}</select></div>
+    <div><label>Lens package</label><input data-s="lens_package" value="${esc(st.lens_package)}"></div><div><label>Film stock</label><input data-s="film_stock" value="${esc(st.film_stock)}"></div>
+    <div><label>Lighting</label><input data-s="lighting_style" value="${esc(st.lighting_style)}"></div><div><label>Score style</label><input data-s="music_style" value="${esc(st.music_style)}"></div></div>
+    <label>Palette</label><div class="row">${st.palette.map((c, i) => `<input type="color" data-pal="${i}" value="${c}" style="width:44px;padding:2px">`).join('')}</div>
+    <label>Negative prompt</label><textarea data-s="negative_prompt">${esc(st.negative_prompt)}</textarea></div></div>
+   <h2 style="margin-top:20px">Cast</h2><div class="grid g2">${b.characters.map((c, i) => `<div class="card" style="border-top:3px solid ${c.color}">
+    <div class="row"><input data-c="${i}" data-f="name" value="${esc(c.name)}" style="font-weight:700;width:auto;flex:1"><select data-c="${i}" data-f="role" style="width:130px">${['lead', 'antagonist', 'supporting', 'extra'].map(r => `<option ${r === c.role ? 'selected' : ''}>${r}</option>`).join('')}</select></div>
+    <label>Physical description (locked identity)</label><textarea data-c="${i}" data-f="description">${esc(c.description)}</textarea>
+    <label>Wardrobe</label><input data-c="${i}" data-f="wardrobe" value="${esc(c.wardrobe)}">
+    <label>Personality · motivation</label><input data-c="${i}" data-f="personality" value="${esc(c.personality)}">
+    <label>Arc (development)</label><input data-c="${i}" data-f="arc" value="${esc(c.arc)}">
+    <label>Mannerisms / direction</label><input data-c="${i}" data-f="mannerisms" value="${esc(c.mannerisms)}">
+    <div class="grid" style="grid-template-columns:1fr 1fr 1fr;gap:6px"><div><label>Voice id</label><input data-c="${i}" data-v="voice_id" value="${esc(c.voice.voice_id)}"></div><div><label>Pitch</label><input type="number" step="0.05" data-c="${i}" data-v="pitch" value="${c.voice.pitch}"></div><div><label>Rate</label><input type="number" step="0.05" data-c="${i}" data-v="rate" value="${c.voice.rate}"></div></div>
+    <label>Identity references (${c.reference_images.length})</label><input type="file" accept="image/*" onchange="uploadRef('${c.id}',this)"></div>`).join('')}</div>
+   <h2 style="margin-top:20px">Locations & props</h2><div class="grid g2">${b.locations.map((l, i) => `<div class="card"><input data-l="${i}" data-f="name" value="${esc(l.name)}" style="font-weight:700">
+    <label>Description</label><textarea data-l="${i}" data-f="description">${esc(l.description)}</textarea><label>Set dressing (mise-en-scène)</label><input data-l="${i}" data-f="set_dressing" value="${esc(l.set_dressing)}"><label>Lighting</label><input data-l="${i}" data-f="lighting" value="${esc(l.lighting)}"></div>`).join('')}
+    ${b.props.map((p, i) => `<div class="card"><input data-p="${i}" data-f="name" value="${esc(p.name)}" style="font-weight:700"><label>Description</label><textarea data-p="${i}" data-f="description">${esc(p.description)}</textarea></div>`).join('')}</div>
+   <div class="row" style="margin:18px 0"><button class="primary" onclick="saveBible()">Save bible</button><span class="muted">Changes propagate to every shot prompt; changed shots regenerate on next render.</span></div>`;
+}
+async function saveBible() {
+  const b = structuredClone(P.bible);
+  document.querySelectorAll('#view [data-k]').forEach(e => b[e.dataset.k] = e.dataset.k === 'outline' ? e.value.split('\n').filter(Boolean) : e.value);
+  document.querySelectorAll('#view [data-s]').forEach(e => b.style[e.dataset.s] = e.value);
+  document.querySelectorAll('#view [data-pal]').forEach(e => b.style.palette[+e.dataset.pal] = e.value);
+  document.querySelectorAll('#view [data-c]').forEach(e => { const c = b.characters[+e.dataset.c]; if (e.dataset.f) c[e.dataset.f] = e.value; if (e.dataset.v) c.voice[e.dataset.v] = e.type === 'number' ? +e.value : e.value });
+  document.querySelectorAll('#view [data-l]').forEach(e => b.locations[+e.dataset.l][e.dataset.f] = e.value);
+  document.querySelectorAll('#view [data-p]').forEach(e => b.props[+e.dataset.p][e.dataset.f] = e.value);
+  P = await api(`/api/projects/${P.id}/bible`, {method: 'PUT', body: b}); toast('Story bible saved'); render();
+}
+async function uploadRef(cid, input) {
+  const f = input.files[0]; if (!f) return;
+  P = await api(`/api/projects/${P.id}/characters/${cid}/reference?filename=${encodeURIComponent(f.name)}`, {method: 'POST', body: f, headers: {'Content-Type': 'application/octet-stream'}});
+  toast('Reference added'); render();
+}
+
+/* ---------------- Screenplay & shots */
+const SIZES = {EWS: 'extreme wide shot', WS: 'wide shot', FS: 'full shot', MS: 'medium shot', MCU: 'medium close-up', CU: 'close-up', ECU: 'extreme close-up', OTS: 'over-the-shoulder shot', POV: 'point-of-view shot', TWO: 'two shot', INSERT: 'insert shot'};
+const ANGLES = ['eye level', 'low angle', 'high angle', 'dutch angle', "bird's-eye view", "worm's-eye view", 'overhead'];
+const MOVES = ['static', 'pan left', 'pan right', 'tilt up', 'tilt down', 'dolly in', 'dolly out', 'truck left', 'truck right', 'crane up', 'crane down', 'handheld', 'steadicam follow', 'orbit', 'slow zoom in', 'slow zoom out'];
+const TRANS = ['cut', 'dissolve', 'fadeblack', 'fadewhite', 'wipeleft', 'wiperight', 'slideleft', 'circleopen', 'smash_cut'];
+const opts = (list, v) => list.map(o => `<option ${o === v ? 'selected' : ''}>${esc(o)}</option>`).join('');
+function vScreenplay() {
+  $('#view').innerHTML = `<div class="row" style="margin-bottom:12px"><a href="/api/projects/${P.id}/screenplay" target="_blank"><button>Export screenplay (.txt)</button></a><button onclick="addScene()">+ Add scene</button></div>` +
+   P.scenes.map((sc, si) => `<div class="card scene"><div class="row"><h2 style="margin:0">${sc.number}. ${esc(sc.heading)}</h2><span class="pill">${esc(sc.beat)}</span><span class="muted">${esc(sc.mood)}</span><div class="spacer"></div>
+    <button class="small" onclick="moveScene(${si},-1)">↑</button><button class="small" onclick="moveScene(${si},1)">↓</button><button class="small" onclick="renderScene('${sc.id}')">Render scene</button><button class="small" onclick="delScene('${sc.id}')">✕</button></div>
+    <p class="muted" style="margin:6px 0">${esc(sc.summary)} <i>Score: ${esc(sc.music_cue)}</i></p>
+    ${sc.shots.map((sh, i) => shotRow(sc, sh, i)).join('')}</div>`).join('');
+}
+function shotRow(sc, sh, i) {
+  const sizeKey = Object.keys(SIZES).find(k => SIZES[k] === sh.size);
+  return `<div class="shot" id="s_${sh.id}"><div><div class="thumb">${sh.clip_path ? `<video src="${file(sh.clip_path)}" muted loop onmouseover="this.play()" onmouseout="this.pause()"></video>` : ''}</div>
+   <div class="row" style="margin-top:5px"><b>${sh.number}</b><span class="st-${sh.status}">${sh.status}</span></div>
+   <div class="row" style="gap:4px;margin-top:4px"><button class="small" onclick="genShot('${sh.id}')">Generate</button><button class="small" onclick="approve('${sh.id}','${sh.status}')">${sh.status === 'approved' ? 'Unlock' : 'Approve'}</button>
+   <button class="small" onclick="moveShot('${sc.id}',${i},-1)">←</button><button class="small" onclick="moveShot('${sc.id}',${i},1)">→</button><button class="small" onclick="delShot('${sh.id}')">✕</button></div>
+   ${sh.takes.length ? `<div class="muted" style="font-size:11px;margin-top:4px">Takes: ${sh.takes.map((t, n) => `<a href="#" onclick="takeSel('${sh.id}',${n});return false">#${n + 1}</a>`).join(' ')}</div>` : ''}
+   ${sh.error ? `<div class="st-failed" style="font-size:11px">${esc(sh.error.slice(0, 160))}</div>` : ''}</div>
+   <div><div class="shot-f">
+    <div><label>Size</label><select data-sh="${sh.id}" data-f="size">${Object.values(SIZES).map(v => `<option ${v === sh.size ? 'selected' : ''}>${v}</option>`).join('')}</select></div>
+    <div><label>Angle</label><select data-sh="${sh.id}" data-f="angle">${opts(ANGLES, sh.angle)}</select></div>
+    <div><label>Camera</label><select data-sh="${sh.id}" data-f="movement">${opts(MOVES, sh.movement)}</select></div>
+    <div><label>Lens / sec</label><div class="row" style="flex-wrap:nowrap;gap:4px"><input type="number" data-sh="${sh.id}" data-f="lens_mm" value="${sh.lens_mm}"><input type="number" step="0.1" data-sh="${sh.id}" data-f="duration" value="${sh.duration}"></div></div>
+    <div><label>Transition in</label><select data-sh="${sh.id}" data-f="transition_in">${opts(TRANS, sh.transition_in)}</select></div></div>
+    <label>Action</label><input data-sh="${sh.id}" data-f="action" value="${esc(sh.action)}">
+    <label>Blocking / character direction</label><input data-sh="${sh.id}" data-f="blocking" value="${esc(sh.blocking)}">
+    ${sh.dialogue.map((l, j) => `<label>${esc(chr(l.character_id)?.name || '?')} ${l.parenthetical ? '(' + esc(l.parenthetical) + ')' : ''} · ${esc(l.emotion)}</label><input data-sh="${sh.id}" data-dl="${j}" value="${esc(l.text)}">`).join('')}
+    <div class="row" style="margin-top:6px"><button class="small" onclick="saveShot('${sh.id}')">Save shot</button><button class="small" onclick="showPrompt('${sh.id}')">View compiled prompt</button><span class="muted" style="font-size:11px">${sh.character_ids.map(c => esc(chr(c)?.name)).join(', ')} ${sh.screen_direction !== 'neutral' ? '· ' + sh.screen_direction : ''}</span></div>
+    <pre id="pr_${sh.id}" style="white-space:pre-wrap;font-size:11px;display:none" class="muted"></pre></div></div>`;
+}
+async function saveShot(id) {
+  const [, sh] = findShot(id), patch = {};
+  document.querySelectorAll(`[data-sh="${id}"][data-f]`).forEach(e => patch[e.dataset.f] = e.type === 'number' ? +e.value : e.value);
+  const dl = structuredClone(sh.dialogue); document.querySelectorAll(`[data-sh="${id}"][data-dl]`).forEach(e => dl[+e.dataset.dl].text = e.value);
+  patch.dialogue = dl; P = await api(`/api/projects/${P.id}/shots/${id}`, {method: 'PATCH', body: patch}); toast('Shot saved'); render();
+}
+function findShot(id) { for (const sc of P.scenes) for (const sh of sc.shots) if (sh.id === id) return [sc, sh]; return [] }
+async function showPrompt(id) { const r = await api(`/api/projects/${P.id}/shots/${id}/prompt`); const el = $('#pr_' + id); el.style.display = 'block'; el.textContent = `PROMPT: ${r.prompt}\n\nNEGATIVE: ${r.negative_prompt}\nSEED: ${r.seed}  REFS: ${r.reference_images.length}  LORAS: ${r.loras.join(', ') || '-'}` }
+async function approve(id, st) { P = await api(`/api/projects/${P.id}/shots/${id}`, {method: 'PATCH', body: {status: st === 'approved' ? 'ready' : 'approved'}}); render() }
+async function delShot(id) { if (confirm('Delete shot?')) { P = await api(`/api/projects/${P.id}/shots/${id}`, {method: 'DELETE'}); render() } }
+async function takeSel(id, n) { P = await api(`/api/projects/${P.id}/shots/${id}/take/${n}`, {method: 'POST'}); render() }
+async function moveShot(sid, i, d) { const sc = P.scenes.find(s => s.id === sid), ids = sc.shots.map(s => s.id), j = i + d; if (j < 0 || j >= ids.length) return; [ids[i], ids[j]] = [ids[j], ids[i]]; P = await api(`/api/projects/${P.id}/scenes/${sid}/order`, {method: 'PUT', body: ids}); render() }
+async function moveScene(i, d) { const ids = P.scenes.map(s => s.id), j = i + d; if (j < 0 || j >= ids.length) return; [ids[i], ids[j]] = [ids[j], ids[i]]; P = await api(`/api/projects/${P.id}/order`, {method: 'PUT', body: ids}); render() }
+async function delScene(id) { if (confirm('Delete scene?')) { P = await api(`/api/projects/${P.id}/scenes/${id}`, {method: 'DELETE'}); render() } }
+async function addScene() {
+  const summary = prompt('What happens in this scene?'); if (!summary) return;
+  const c = P.bible.characters, line = prompt(`First line of dialogue for ${c[0].name} (optional)`) || '';
+  P = await api(`/api/projects/${P.id}/scenes`, {method: 'POST', body: {summary, mood: P.bible.style.tone, action: [summary], dialogue: line ? [{character_id: c[0].id, text: line}] : []}}); render();
+}
+async function genShot(id) { const {job_id} = await api(`/api/projects/${P.id}/shots/${id}/generate`, {method: 'POST'}); await follow(job_id); openProject(P.id) }
+async function renderScene(sid) { const {job_id} = await api(`/api/projects/${P.id}/render`, {method: 'POST', body: {scene_id: sid}}); TAB = 'render'; render(); await follow(job_id); if (TAB === 'render') openProject(P.id) }
+
+/* ---------------- Editor (timeline) */
+let ZOOM = 14;
+async function vEditor() {
+  const tl = await api(`/api/projects/${P.id}/timeline`), w = Math.max(800, tl.duration * ZOOM);
+  const blk = (cls, start, dur, label, extra = '') => `<div class="clip ${cls}" style="left:${start * ZOOM}px;width:${Math.max(4, dur * ZOOM - 2)}px" title="${esc(label)}" ${extra}>${esc(label)}</div>`;
+  let music = '', t = 0; const sceneStart = {}; tl.clips.forEach(c => { if (!(c.scene_id in sceneStart)) sceneStart[c.scene_id] = c.start });
+  const sceneEnd = {}; tl.clips.forEach(c => sceneEnd[c.scene_id] = c.start + c.duration);
+  tl.music.forEach(m => { if (m.scene_id in sceneStart) music += blk('m', sceneStart[m.scene_id], sceneEnd[m.scene_id] - sceneStart[m.scene_id], '♪ ' + m.cue) });
+  $('#view').innerHTML = `<div class="row" style="margin-bottom:10px"><b>${fmt(tl.duration)}</b><span class="muted">${tl.clips.length} clips</span><div class="spacer"></div>Zoom <input type="range" min="4" max="60" value="${ZOOM}" style="width:160px" oninput="ZOOM=+this.value;vEditor()"></div>
+   <div class="grid" style="grid-template-columns:minmax(0,2fr) minmax(0,1fr)"><div><video class="player" id="pv" controls></video></div><div class="card" id="insp"><span class="muted">Select a clip to inspect, trim, or change its transition.</span></div></div>
+   <div class="tl" style="margin-top:12px"><div style="width:${w + 80}px">
+    <div class="track"><span class="tname">PICTURE</span>${tl.clips.map(c => blk('v ' + (c.clip ? 'ready' : '') + (SEL === c.shot_id ? ' sel' : ''), c.start, c.duration, `${c.number}${c.transition !== 'cut' ? ' ⟋' + c.transition : ''}`, `onclick="selClip('${c.shot_id}')"`)).join('')}</div>
+    <div class="track"><span class="tname">DIALOGUE</span>${tl.clips.flatMap(c => c.dialogue.map(d => blk('d', d.start, d.duration || 2, (chr(d.character_id)?.name || '') + ': ' + d.text))).join('')}</div>
+    <div class="track"><span class="tname">MUSIC</span>${music}</div>
+    <div class="track"><span class="tname">SFX</span>${tl.clips.flatMap(c => c.sounds.map(s => blk('s', s.start, s.duration, s.description))).join('')}</div>
+   </div></div>`;
+  if (SEL) selClip(SEL);
+}
+function selClip(id) {
+  SEL = id; const [sc, sh] = findShot(id); if (!sh) return;
+  document.querySelectorAll('.clip.v').forEach(e => e.classList.toggle('sel', e.getAttribute('onclick')?.includes(id)));
+  if (sh.clip_path) { $('#pv').src = file(sh.clip_path); $('#pv').play().catch(() => {}) }
+  $('#insp').innerHTML = `<h3>${sh.number} · ${esc(sh.size)}</h3><div class="muted">${esc(sc.heading)}</div><p>${esc(sh.action)}</p>
+   <label>Duration (trim, seconds)</label><input type="number" step="0.1" id="i_dur" value="${sh.duration}">
+   <label>Transition in</label><select id="i_tr">${opts(TRANS, sh.transition_in)}</select>
+   <div class="row" style="margin-top:10px"><button class="primary small" onclick="saveClip('${id}')">Apply</button><button class="small" onclick="genShot('${id}')">Regenerate</button></div>`;
+}
+async function saveClip(id) { P = await api(`/api/projects/${P.id}/shots/${id}`, {method: 'PATCH', body: {duration: +$('#i_dur').value, transition_in: $('#i_tr').value}}); toast('Timeline updated'); vEditor() }
+
+/* ---------------- Audio studio */
+function vAudio() {
+  const m = P.mix, tr = k => `<div class="card"><h3>${k[0].toUpperCase() + k.slice(1)}</h3><label>Volume <span id="v_${k}">${m[k].volume.toFixed(2)}</span></label><input type="range" min="0" max="2" step="0.05" value="${m[k].volume}" data-mix="${k}" oninput="$('#v_${k}').textContent=(+this.value).toFixed(2)"><label><input type="checkbox" style="width:auto" data-mute="${k}" ${m[k].mute ? 'checked' : ''}> Mute</label></div>`;
+  $('#view').innerHTML = `<div class="grid g4">${tr('dialogue')}${tr('music')}${tr('sfx')}<div class="card"><h3>Master</h3>
+   <label><input type="checkbox" style="width:auto" id="m_duck" ${m.ducking ? 'checked' : ''}> Duck music under dialogue</label>
+   <label>Duck depth</label><input type="range" min="0" max="9" step="0.5" id="m_depth" value="${m.duck_amount}">
+   <label>Loudness target (LUFS)</label><select id="m_lufs">${[[-14, 'Streaming -14'], [-16, 'Web -16'], [-23, 'EBU broadcast -23'], [-24, 'ATSC broadcast -24'], [-27, 'Theatrical-ish -27']].map(([v, l]) => `<option value="${v}" ${v === m.loudness_lufs ? 'selected' : ''}>${l}</option>`).join('')}</select>
+   <label><input type="checkbox" style="width:auto" id="m_subs" ${m.burn_subtitles ? 'checked' : ''}> Burn in subtitles</label></div></div>
+   <h2 style="margin-top:18px">Picture finishing</h2><div class="grid g4"><div class="card"><label>Grade</label><select id="g_pre">${['auto', 'teal_orange', 'warm', 'cool', 'noir', 'pastel', 'vivid', 'none'].map(g => `<option ${g === P.grade.preset ? 'selected' : ''}>${g}</option>`).join('')}</select>
+   <label><input type="checkbox" style="width:auto" id="g_grain" ${P.grade.grain ? 'checked' : ''}> Film grain</label><label><input type="checkbox" style="width:auto" id="g_vig" ${P.grade.vignette ? 'checked' : ''}> Vignette</label><label><input type="checkbox" style="width:auto" id="g_lb" ${P.grade.letterbox ? 'checked' : ''}> Letterbox to 16:9</label></div></div>
+   <h2 style="margin-top:18px">Voices</h2><div class="grid g2">${P.scenes.flatMap(s => s.shots.flatMap(sh => sh.dialogue.filter(l => l.audio_path).map(l => `<div class="card"><b>${esc(chr(l.character_id)?.name)}</b> <span class="muted">${sh.number}</span><div>${esc(l.text)}</div><audio controls src="${file(l.audio_path)}" style="width:100%"></audio></div>`))).slice(0, 40).join('') || '<div class="muted">Render to generate voices.</div>'}</div>
+   <div class="row" style="margin:16px 0"><button class="primary" onclick="saveMix()">Save mix & finishing</button><span class="muted">Applied on the next render (no regeneration needed).</span></div>`;
+}
+async function saveMix() {
+  const mix = structuredClone(P.mix);
+  document.querySelectorAll('[data-mix]').forEach(e => mix[e.dataset.mix].volume = +e.value);
+  document.querySelectorAll('[data-mute]').forEach(e => mix[e.dataset.mute].mute = e.checked);
+  Object.assign(mix, {ducking: $('#m_duck').checked, duck_amount: +$('#m_depth').value, loudness_lufs: +$('#m_lufs').value, burn_subtitles: $('#m_subs').checked});
+  await api(`/api/projects/${P.id}/mix`, {method: 'PUT', body: mix});
+  P = await api(`/api/projects/${P.id}/grade`, {method: 'PUT', body: {preset: $('#g_pre').value, grain: $('#g_grain').checked, vignette: $('#g_vig').checked, letterbox: $('#g_lb').checked}});
+  toast('Mix saved');
+}
+
+/* ---------------- Continuity */
+async function vContinuity() {
+  const is = await api(`/api/projects/${P.id}/continuity`);
+  $('#view').innerHTML = `<p class="muted">The script supervisor checks identity locks, wardrobe, the 180-degree rule, jump cuts, dialogue timing and broken references.</p>` +
+   (is.length ? is.map(i => `<div class="issue ${i.severity}"><b>${i.severity}</b> · ${esc(i.message)} ${i.shot_id ? `<a href="#" onclick="TAB='screenplay';render();setTimeout(()=>document.getElementById('s_${i.shot_id}')?.scrollIntoView(),50);return false">go to shot</a>` : ''}</div>`).join('') : '<div class="card">No continuity issues found.</div>');
+}
+
+/* ---------------- Render */
+async function vRender() {
+  const jobs = await api(`/api/jobs?project_id=${P.id}`), active = jobs.find(j => j.status === 'running' || j.status === 'queued');
+  $('#view').innerHTML = `<div class="row"><button class="primary" onclick="renderFilm(false)" ${active ? 'disabled' : ''}>Render full film</button><button onclick="renderFilm(true)" ${active ? 'disabled' : ''}>Force regenerate all shots</button>
+   <a href="/api/projects/${P.id}/dataset" target="_blank"><button>Export training dataset</button></a></div>
+   <div id="jobbox" style="margin:14px 0">${active ? jobHtml(active) : ''}</div>
+   ${P.renders.map((r, i) => `<div class="card" style="margin-bottom:14px"><div class="row"><b>${esc(r.scope)}</b><span class="muted">${new Date(r.created * 1000).toLocaleString()} · ${fmt(r.duration)}</span><div class="spacer"></div>
+     <a href="${file(r.video_path)}" download><button class="small">MP4</button></a>${r.subtitles_path ? `<a href="${file(r.subtitles_path)}" download><button class="small">SRT</button></a>` : ''}${r.edl_path ? `<a href="${file(r.edl_path)}" download><button class="small">EDL</button></a>` : ''}</div>
+     ${i === 0 ? `<video class="player" style="margin-top:10px" controls src="${file(r.video_path)}"></video>` : ''}</div>`).join('') || '<div class="muted">No renders yet.</div>'}
+   <h3 style="margin-top:18px">Recent jobs</h3>${jobs.slice(0, 8).map(j => `<div class="muted" style="font-size:12px">${j.kind} · ${j.status} · ${esc(j.message)} ${j.error ? `<span class="st-failed">${esc(j.error.split('\n')[0])}</span>` : ''}</div>`).join('')}`;
+  if (active) follow(active.id).then(() => { if (TAB === 'render') openProject(P.id) });
+}
+const jobHtml = j => `<div class="card"><div class="row"><b>${j.kind}</b><span class="muted">${esc(j.message)}</span><div class="spacer"></div>${Math.round(j.progress * 100)}%</div><div class="bar" style="margin-top:8px"><i style="width:${j.progress * 100}%"></i></div></div>`;
+async function renderFilm(force) { const {job_id} = await api(`/api/projects/${P.id}/render`, {method: 'POST', body: {force}}); vRender() }
+async function follow(id) {
+  for (;;) {
+    const j = await api(`/api/jobs/${id}`); const box = $('#jobbox'); if (box) box.innerHTML = jobHtml(j);
+    if (j.status === 'done') { toast(`${j.kind} finished`); return j }
+    if (j.status === 'failed') { toast(j.error.split('\n')[0], true); return j }
+    await new Promise(r => setTimeout(r, 1000));
+  }
+}
+boot();
+</script>
+</body>
+</html>

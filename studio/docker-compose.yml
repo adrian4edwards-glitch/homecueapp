@@ -1,0 +1,25 @@
+# HomeCue Studio - full self-hosted stack.
+#   docker compose up engine            -> runs immediately on CPU (previz mode)
+#   docker compose --profile ai up      -> adds the local writers' room LLM (Ollama)
+# The GPU video model (ComfyUI) and voice/music servers are documented in docs/SELF_HOSTED_MODELS.md;
+# point the engine at them with the CUESTUDIO_* variables below.
+services:
+  engine:
+    build: ./engine
+    ports: ["8000:8000"]
+    volumes: ["studio-data:/data"]
+    environment:
+      CUESTUDIO_WORKERS: "2"
+      CUESTUDIO_LLM_URL: ${CUESTUDIO_LLM_URL:-}          # e.g. http://ollama:11434/v1
+      CUESTUDIO_LLM_MODEL: ${CUESTUDIO_LLM_MODEL:-llama3.1:8b}
+      CUESTUDIO_COMFY_URL: ${CUESTUDIO_COMFY_URL:-}      # e.g. http://gpu-box:8188
+      CUESTUDIO_TTS_URL: ${CUESTUDIO_TTS_URL:-}          # e.g. http://gpu-box:8880/v1
+      CUESTUDIO_MUSIC_URL: ${CUESTUDIO_MUSIC_URL:-}      # e.g. http://gpu-box:8890
+  ollama:
+    image: ollama/ollama
+    profiles: ["ai"]
+    ports: ["11434:11434"]
+    volumes: ["ollama:/root/.ollama"]
+volumes:
+  studio-data:
+  ollama:
